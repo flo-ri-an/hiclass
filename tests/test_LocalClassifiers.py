@@ -1,10 +1,9 @@
-import os
 import pickle
+import os
 
 import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
-from pyfakefs.fake_filesystem_unittest import Patcher
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.utils.validation import check_is_fitted
@@ -14,7 +13,6 @@ from hiclass import (
     LocalClassifierPerNode,
     LocalClassifierPerParentNode,
 )
-from hiclass.ConstantClassifier import ConstantClassifier
 
 classifiers = [
     LocalClassifierPerLevel,
@@ -111,20 +109,20 @@ def test_predict_multiple_dim_input(classifier):
 
 
 @pytest.mark.parametrize("classifier", classifiers)
-def test_tmp_dir(classifier):
-    clf = classifier(tmp_dir=".")
-    with Patcher() as patcher:
-        x = np.array([[1, 2], [3, 4]])
-        y = np.array([["a", "b"], ["c", "d"]])
-        clf.fit(x, y)
-        if isinstance(clf, LocalClassifierPerLevel):
-            filename = "cfcd208495d565ef66e7dff9f98764da.sav"
-            expected_name = 0
-        else:
-            filename = "0cc175b9c0f1b6a831c399e269772661.sav"
-            expected_name = "a"
-        assert patcher.fs.exists(filename)
-        (name, classifier) = pickle.load(open(filename, "rb"))
-        assert expected_name == name
-        check_is_fitted(classifier)
-        clf.fit(x, y)
+def test_tmp_dir(classifier, tmp_path):
+    clf = classifier(tmp_dir=tmp_path)
+    x = np.array([[1, 2], [3, 4]])
+    y = np.array([["a", "b"], ["c", "d"]])
+    clf.fit(x, y)
+    if isinstance(clf, LocalClassifierPerLevel):
+        filename = "cfcd208495d565ef66e7dff9f98764da.sav"
+        expected_name = 0
+    else:
+        filename = "0cc175b9c0f1b6a831c399e269772661.sav"
+        expected_name = "a"
+    filepath = tmp_path / filename
+    assert filepath.exists()
+    (name, classifier) = pickle.load(open(filepath, "rb"))
+    assert expected_name == name
+    check_is_fitted(classifier)
+    os.remove(filepath)
