@@ -42,6 +42,7 @@ EXTRAS = {
         "black==24.2.0",
         "pre-commit==2.20.0",
         "ray",
+        "pandas",
     ],
 }
 
