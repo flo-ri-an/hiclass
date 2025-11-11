@@ -32,7 +32,7 @@ REQUIRED = ["networkx", "numpy", "scikit-learn>=1.5", "scipy"]
 # What packages are optional?
 # 'fancy feature': ['django'],}
 EXTRAS = {
-    "ray": ["ray>=1.11.0"],
+    "ray": ["ray>=2.0.0"],
     "dev": [
         "flake8",
         "pytest",
